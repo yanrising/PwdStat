@@ -400,8 +400,9 @@ if __name__ == '__main__':
     try:
         if not args.quiet:
             message('', banner=True)
-        df = pd.read_table(args.input, header=None, names=['Password'])
-    except (FileNotFoundError, ValueError):
+        df = pd.read_table(args.input, header=None, names=['Password'], quoting=3, on_bad_lines='skip')
+        df['Password'] = df['Password'].astype(str)
+    except FileNotFoundError:
         print('No input file found')
         exit()
 
