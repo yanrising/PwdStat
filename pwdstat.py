@@ -50,7 +50,7 @@ class PasswordAnalyzer:
     Takes in a list of passwords and analyzes them
     """
 
-    def __init__(self, password_df):
+    def __init__(self, password_df, filter_lowqual):
         self.compositionType = None
         self.mask = None
         self.alphaLst = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
@@ -59,17 +59,18 @@ class PasswordAnalyzer:
         self.specialLst = [' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';',
                            '<', '=', '>', '?', '@', '[', '\', \']', '^', '_', '`', '{', '|', '}', '~', ']']
         self.df = password_df
+        self.filter = filter_lowqual
 
     def classify_passwords(self):
         """
         Generates primary columns per password
         """
-        df['Class'] = [self.test_class(x) for x in df['Password']]
-        df['Complexity'] = [self.test_complexity(x) for x in df['Password']]
-        df['Length'] = df['Password'].apply(len)
-        df['Class'] = df['Class'].astype('category')
-        df['Complexity'] = df['Complexity'].astype('int8')
-        df['Length'] = df['Length'].astype('int8')
+        self.df['Class'] = self.df['Password'].apply(lambda x: self.test_class(x))
+        self.df['Complexity'] = self.df['Password'].apply(lambda x: self.test_complexity(x))
+        self.df['Length'] = self.df['Password'].apply(len)
+        self.df['Class'] = self.df['Class'].astype('category')
+        self.df['Complexity'] = self.df['Complexity'].astype('int8')
+        self.df['Length'] = self.df['Length'].astype('int8')
 
     def test_class(self, password_str):
         """
@@ -167,8 +168,8 @@ class PasswordAnalyzer:
         """
         Generates a Hashcat mask for each password as a new column
         """
-        df['Mask'] = [self.make_mask(x) for x in df['Password']]
-        df['Mask'] = df['Mask'].astype('category')
+        self.df['Mask'] = df['Password'].apply(lambda x: self.make_mask(x))
+        self.df['Mask'] = self.df['Mask'].astype('category')
 
     def make_mask(self, password_str):
         """
@@ -195,10 +196,10 @@ class PasswordAnalyzer:
         Generates a token list for each password as a new column
         :return: pd.DataFrame
         """
-        x = [self.gen_tokens(x) for x in df['Password']]
-        y = [str(item[0]) for item in x]
-        df_tokens = pd.DataFrame(y).value_counts(ascending=False).to_frame().set_axis(['Count'], axis=1,
-                                                                                      inplace=False).reset_index()
+        nested_tokens = self.df['Password'].apply(lambda i: self.gen_tokens(i))
+        expanded_tokens = [str(item[0]) for item in nested_tokens]
+        df_tokens = pd.DataFrame(expanded_tokens).value_counts(ascending=False).to_frame().set_axis(['Count'], axis=1,
+                                                                                                    inplace=False).reset_index()
         df_tokens.columns = ['Tokens', 'Count']
         df_tokens.reset_index(drop=True)
         df_tokens = df_tokens[df_tokens['Count'] > 1]
@@ -223,6 +224,10 @@ class PasswordAnalyzer:
         Calls primary analysis functions
         """
         self.classify_passwords()
+        if self.filter:
+            self.df = self.df[self.df['Class'] != '0: subpar']
+        else:
+            self.df = self.df
         self.gen_masks()
 
     def lookup_directory(self, compare_dir):
@@ -238,41 +243,35 @@ class PasswordAnalyzer:
                                            encoding='ISO-8859-1')
                 self.lookup_password(df_compare, title)
 
-    @staticmethod
-    def lookup_password(compare_df, title):
+    def lookup_password(self, compare_df, title):
         """
         Compares two password lists for shared passwords then reports in a new column
         :param compare_df: dataframe to compare against
         :param title: string name of created column
         :return: none (appends to given df)
         """
-        df_joined = df.merge(compare_df, how='inner', on=['Password'])
+        df_joined = self.df.merge(compare_df, how='inner', on=['Password'])
         lst_joined = list(set(df_joined.Password.unique().tolist()))
 
         for q in lst_joined:
-            df.loc[(df['Password'] == q), str(title)] = 1
-        df[title].fillna(0, inplace=True)
-        df[title] = df[title].astype('int8')
+            self.df.loc[(self.df['Password'] == q), str(title)] = 1
+        self.df[title].fillna(0, inplace=True)
+        self.df[title] = self.df[title].astype('int8')
 
-    def report(self, filter_lowqual):
+    def report(self):
         """
         Generates aggregate DFs for printing and print stats to CLI
         :param filter_lowqual: bool to filter subpar results and results less than 0.01% of the sample
         """
-        if filter_lowqual:
-            df = self.df[self.df['Class'] != '0: subpar']
-        else:
-            df = self.df
-
         df_tokens = pwdAnalyzer.tokenize_passwords()
 
-        df_class_agg = df.groupby(by='Class').agg(
+        df_class_agg = self.df.groupby(by='Class').agg(
             {'Password': 'count', 'Complexity': 'mean', 'Length': 'mean'}).reset_index()
         df_class_agg.columns = ['Class', 'Password', 'Complexity', 'Length']
         df_class_agg.reset_index(drop=True)
         df_class_agg.rename(columns={'Password': 'Count'}, inplace=True)
 
-        df_mask_agg = df.groupby(by='Mask').agg(
+        df_mask_agg = self.df.groupby(by='Mask').agg(
             {'Password': 'count', 'Complexity': 'mean', 'Length': 'mean'}).sort_values(by='Password',
                                                                                        ascending=False).reset_index()
         df_mask_agg.columns = ['Mask', 'Password', 'Complexity', 'Length']
@@ -280,23 +279,23 @@ class PasswordAnalyzer:
         df_mask_agg = df_mask_agg[df_mask_agg['Password'] > 1]
         df_mask_agg.rename(columns={'Password': 'Count'}, inplace=True)
 
-        df_password_agg = df.groupby(by='Password').agg(
+        df_password_agg = self.df.groupby(by='Password').agg(
             {'Password': 'count', 'Complexity': 'mean', 'Length': 'mean'}).rename_axis(None).sort_values(by='Password',
                                                                                                          ascending=False).reset_index()
         df_password_agg.columns = ['Password', 'Count', 'Complexity', 'Length']
         df_password_agg.reset_index(drop=True)
 
-        if filter_lowqual:
+        if self.filter:
             df_mask_agg = df_mask_agg[df_mask_agg['Count'] > round(df_mask_agg.size * 0.001, 0)]
             df_tokens = df_tokens[df_tokens['Count'] > round(df_tokens.size * 0.001, 0)]
 
-        self.print_stats(df, 'full')
+        self.print_stats(self.df, 'full')
         self.print_stats(df_password_agg, 'password_agg')
         self.print_stats(df_tokens, 'tokens')
         self.print_stats(df_mask_agg, 'mask_agg')
 
         if args.output:
-            df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False)
+            self.df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False)
             df_tokens.to_csv(os.path.join(args.output, 'common_tokens.csv'), index=False)
             df_class_agg.to_csv(os.path.join(args.output, 'password_classes.csv'), index=False)
             df_mask_agg.to_csv(os.path.join(args.output, 'password_masks.csv'), index=False)
@@ -390,7 +389,7 @@ if __name__ == '__main__':
                         help="Hides banner")
 
     dep_check()
-
+    pd.set_option('mode.chained_assignment', None)
     args = parser.parse_args()
     stemmer = PorterStemmer()
 
@@ -413,7 +412,7 @@ if __name__ == '__main__':
         print('No input file found')
         exit()
 
-    pwdAnalyzer = PasswordAnalyzer(df)
+    pwdAnalyzer = PasswordAnalyzer(df, args.filter)
     pwdAnalyzer.analyze_passwords()
     pwdAnalyzer.lookup_directory(args.compare)
-    pwdAnalyzer.report(args.filter)
+    pwdAnalyzer.report()
