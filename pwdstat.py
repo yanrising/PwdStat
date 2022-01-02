@@ -67,6 +67,9 @@ class PasswordAnalyzer:
         df['Class'] = [self.test_class(x) for x in df['Password']]
         df['Complexity'] = [self.test_complexity(x) for x in df['Password']]
         df['Length'] = df['Password'].apply(len)
+        df['Class'] = df['Class'].astype('category')
+        df['Complexity'] = df['Complexity'].astype('int8')
+        df['Length'] = df['Length'].astype('int8')
 
     def test_class(self, password_str):
         """
@@ -165,6 +168,7 @@ class PasswordAnalyzer:
         Generates a Hashcat mask for each password as a new column
         """
         df['Mask'] = [self.make_mask(x) for x in df['Password']]
+        df['Mask'] = df['Mask'].astype('category')
 
     def make_mask(self, password_str):
         """
@@ -246,7 +250,9 @@ class PasswordAnalyzer:
         lst_joined = list(set(df_joined.Password.unique().tolist()))
 
         for q in lst_joined:
-            df.loc[(df['Password'] == q), str(title)] = 'TRUE'
+            df.loc[(df['Password'] == q), str(title)] = 1
+        df[title].fillna(0, inplace=True)
+        df[title] = df[title].astype('int8')
 
     def report(self, filter_lowqual):
         """
@@ -309,7 +315,8 @@ class PasswordAnalyzer:
             message(
                 'Microsoft minimum password complexity requires 3 of the following criteria: 1 lowercase, 1 uppercase, 1 digit, and 1 special character.',
                 title=True)
-            message('There are ' + message(str(len(df2print)), word=True) + ' passwords in the sample and the average complexity is ' + message(
+            message('There are ' + message(str(len(df2print)),
+                                           word=True) + ' passwords in the sample and the average complexity is ' + message(
                 str(round(df2print['Complexity'].mean(), 1)) + '/4',
                 word=True) + ' and the average length is ' + message(
                 str(round(df2print['Length'].mean(), 1)), word=True), stat=True)
@@ -336,7 +343,7 @@ class PasswordAnalyzer:
                 message('Password Lookup:', title=True)
                 for i in os.listdir(args.compare):
                     try:
-                        message(message(str(df2print['Is In ' + str(i)].count()),
+                        message(message(str(df2print['Is In ' + str(i)].sum()),
                                         word=True) + ' passwords were also in ' + message(str(i), word=True), stat=True)
                     except KeyError:
                         pass
