@@ -65,12 +65,9 @@ class PasswordAnalyzer:
         """
         Generates primary columns per password
         """
-        self.df['Class'] = self.df['Password'].apply(lambda x: self.test_class(x))
-        self.df['Complexity'] = self.df['Password'].apply(lambda x: self.test_complexity(x))
-        self.df['Length'] = self.df['Password'].apply(len)
-        self.df['Class'] = self.df['Class'].astype('category')
-        self.df['Complexity'] = self.df['Complexity'].astype('int8')
-        self.df['Length'] = self.df['Length'].astype('int8')
+        self.df['Class'] = self.df['Password'].apply(lambda x: self.test_class(x)).astype('category')
+        self.df['Complexity'] = self.df['Password'].apply(lambda x: self.test_complexity(x)).astype('int8')
+        self.df['Length'] = self.df['Password'].apply(len).astype('int8')
 
     def test_class(self, password_str):
         """
@@ -168,8 +165,7 @@ class PasswordAnalyzer:
         """
         Generates a Hashcat mask for each password as a new column
         """
-        self.df['Mask'] = df['Password'].apply(lambda x: self.make_mask(x))
-        self.df['Mask'] = self.df['Mask'].astype('category')
+        self.df['Mask'] = df['Password'].apply(lambda x: self.make_mask(x)).astype('category')
 
     def make_mask(self, password_str):
         """
@@ -261,7 +257,6 @@ class PasswordAnalyzer:
     def report(self):
         """
         Generates aggregate DFs for printing and print stats to CLI
-        :param filter_lowqual: bool to filter subpar results and results less than 0.01% of the sample
         """
         df_tokens = pwdAnalyzer.tokenize_passwords()
 
