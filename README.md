@@ -110,8 +110,11 @@ git clone
 pip install -r requirements.txt
 ```
 ## Output
-The `-o` flag is used to direct the CSV output files to a directory by default **PwdStat** does not print output files. Five output files will be created with the following keys:
-
+The `-o` flag is used to direct the CSV output files to a directory by default **PwdStat** does not print output files. 
+The files are **tab** seperated for easy parsing without quoting issues.
+```
+cat passwords.csv | awk -F '\t' '{print $1}'
+```
 ### passwords.csv
 All of the passwords from the set tagged
 |Password|Class|Complexity|Length|Mask|Is In *|

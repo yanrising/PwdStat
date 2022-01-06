@@ -290,11 +290,11 @@ class PasswordAnalyzer:
         self.print_stats(df_mask_agg, 'mask_agg')
 
         if args.output:
-            self.df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False)
-            df_tokens.to_csv(os.path.join(args.output, 'common_tokens.csv'), index=False)
-            df_class_agg.to_csv(os.path.join(args.output, 'password_classes.csv'), index=False)
-            df_mask_agg.to_csv(os.path.join(args.output, 'password_masks.csv'), index=False)
-            df_password_agg.to_csv(os.path.join(args.output, 'passwords_agg.csv'), index=False)
+            self.df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
+            df_tokens.to_csv(os.path.join(args.output, 'common_tokens.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
+            df_class_agg.to_csv(os.path.join(args.output, 'password_classes.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
+            df_mask_agg.to_csv(os.path.join(args.output, 'password_masks.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
+            df_password_agg.to_csv(os.path.join(args.output, 'passwords_agg.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
 
     def print_stats(self, df2print, type_str):
         """
