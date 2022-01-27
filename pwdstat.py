@@ -31,9 +31,11 @@ def message(msg, title=False, stat=False, word=False, banner=False):
         ENDC = '\033[0m'
         BOLD = '\033[1m'
 
-    banner_text = """ __        __   __  ___      ___ 
-|__) |  | |  \ /__`  |   /\   |  
-|    |/\| |__/ .__/  |  /~~\  |  """
+    banner_text = """ ▄▄▄·▄▄▌ ▐ ▄▌·▄▄▄▄  .▄▄ · ▄▄▄▄▄ ▄▄▄· ▄▄▄▄▄
+▐█ ▄███· █▌▐███▪ ██ ▐█ ▀. •██  ▐█ ▀█ •██  
+ ██▀·██▪▐█▐▐▌▐█· ▐█▌▄▀▀▀█▄ ▐█.▪▄█▀▀█  ▐█.▪
+▐█▪·•▐█▌██▐█▌██. ██ ▐█▄▪▐█ ▐█▌·▐█ ▪▐▌ ▐█▌·
+.▀    ▀▀▀▀ ▀▪▀▀▀▀▀•  ▀▀▀▀  ▀▀▀  ▀  ▀  ▀▀▀  """
 
     if title:
         print(f'{Colors.GREEN}{Colors.BOLD}[*] {msg}{Colors.ENDC}')
@@ -373,7 +375,7 @@ if __name__ == '__main__':
     init()
     parser = argparse.ArgumentParser(
         description='Tool for identifying systemic password usage, creating password masks, and analyzing cracked password samples with human readable statistics')
-    parser.add_argument("-i", "--input", action="store", default=False, help='Input list of passwords.')
+    parser.add_argument("-i", "--input", action="store", default='yourfilenamehere', help='Input list of passwords.')
     parser.add_argument("-c", "--compare", action="store", default=False,
                         help='Directory of lists to compare against.')
     parser.add_argument("-o", "--output", action="store", default=False,
