@@ -33,14 +33,12 @@ def message(msg, title=False, stat=False, word=False, banner=False):
         ENDC = '\033[0m'
         BOLD = '\033[1m'
 
-    banner_text = """ ▄▄▄·▄▄▌ ▐ ▄▌·▄▄▄▄  .▄▄ · ▄▄▄▄▄ ▄▄▄· ▄▄▄▄▄
-▐█ ▄███· █▌▐███▪ ██ ▐█ ▀. •██  ▐█ ▀█ •██  
- ██▀·██▪▐█▐▐▌▐█· ▐█▌▄▀▀▀█▄ ▐█.▪▄█▀▀█  ▐█.▪
-▐█▪·•▐█▌██▐█▌██. ██ ▐█▄▪▐█ ▐█▌·▐█ ▪▐▌ ▐█▌·
-.▀    ▀▀▀▀ ▀▪▀▀▀▀▀•  ▀▀▀▀  ▀▀▀  ▀  ▀  ▀▀▀  """
+    banner_text = """ __        __   __  ___      ___
+|__) |  | |  \ /__`  |   /\   |
+|    |/\| |__/ .__/  |  /~~\  |"""
 
     if title:
-        print(f'{Colors.GREEN}{Colors.BOLD}[*] {msg}{Colors.ENDC}')
+        print(f'{Colors.GREEN}{Colors.BOLD}\n[*] {msg}{Colors.ENDC}')
     elif stat:
         print(f'{Colors.BLUE}{msg}{Colors.ENDC}')
     elif word:
@@ -309,10 +307,10 @@ class PasswordAnalyzer:
         if type_str == 'full':
             message('Password Stats:', title=True)
             message('Reminder the sample is ONLY cracked passwords and data points should be reflected on as so',
-                    title=True)
+                    stat=True)
             message(
-                'Microsoft minimum password complexity requires 3 of the following criteria: 1 lowercase, 1 uppercase, 1 digit, and 1 special character.',
-                title=True)
+                'Microsoft minimum password complexity requires 3 of the following criteria: 1 lowercase, 1 uppercase, 1 digit, and 1 special character.\n',
+                stat=True)
             message('There are ' + message(str(len(df2print)),
                                            word=True) + ' passwords in the sample and the average complexity is ' + message(
                 str(round(df2print['Complexity'].mean(), 1)) + '/4',

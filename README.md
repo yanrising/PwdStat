@@ -47,11 +47,9 @@ pwdstat.py -i cracked_wordlist.txt -c ./breach-data/
 Input and compare but also output CSV files with data to a directory.
 ```
 pwdstat.py -i cracked_wordlist.txt -c ./breach-data -o pwd_output
- ▄▄▄·▄▄▌ ▐ ▄▌·▄▄▄▄  .▄▄ · ▄▄▄▄▄ ▄▄▄· ▄▄▄▄▄
-▐█ ▄███· █▌▐███▪ ██ ▐█ ▀. •██  ▐█ ▀█ •██
- ██▀·██▪▐█▐▐▌▐█· ▐█▌▄▀▀▀█▄ ▐█.▪▄█▀▀█  ▐█.▪
-▐█▪·•▐█▌██▐█▌██. ██ ▐█▄▪▐█ ▐█▌·▐█ ▪▐▌ ▐█▌·
-.▀    ▀▀▀▀ ▀▪▀▀▀▀▀•  ▀▀▀▀  ▀▀▀  ▀  ▀  ▀▀▀
+ __        __   __  ___      ___
+|__) |  | |  \ /__`  |   /\   |
+|    |/\| |__/ .__/  |  /~~\  |
 [*] Password Stats:
 [*] Reminder the sample is ONLY cracked passwords and data points should be reflected on as so
 [*] Microsoft minimum password complexity requires 3 of the following criteria: 1 lowercase, 1 uppercase, 1 digit, and 1 special character.
