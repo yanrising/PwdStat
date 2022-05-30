@@ -273,6 +273,7 @@ class PasswordAnalyzer:
                                                                                        ascending=False).reset_index()
         df_mask_agg.columns = ['Mask', 'Password', 'Complexity', 'Length']
         df_mask_agg.reset_index(drop=True)
+        # may need to comment the line below when dealing with small input
         df_mask_agg = df_mask_agg[df_mask_agg['Password'] > 1]
         df_mask_agg.rename(columns={'Password': 'Count'}, inplace=True)
 
@@ -292,11 +293,16 @@ class PasswordAnalyzer:
         self.print_stats(df_mask_agg, 'mask_agg')
 
         if args.output:
-            self.df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
-            df_tokens.to_csv(os.path.join(args.output, 'common_tokens.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
-            df_class_agg.to_csv(os.path.join(args.output, 'password_classes.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
-            df_mask_agg.to_csv(os.path.join(args.output, 'password_masks.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
-            df_password_agg.to_csv(os.path.join(args.output, 'passwords_agg.csv'), index=False, quoting=3, quotechar='', escapechar='', sep='\t')
+            self.df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False, quoting=3, quotechar='',
+                           escapechar='', sep='\t')
+            df_tokens.to_csv(os.path.join(args.output, 'common_tokens.csv'), index=False, quoting=3, quotechar='',
+                             escapechar='', sep='\t')
+            df_class_agg.to_csv(os.path.join(args.output, 'password_classes.csv'), index=False, quoting=3, quotechar='',
+                                escapechar='', sep='\t')
+            df_mask_agg.to_csv(os.path.join(args.output, 'password_masks.csv'), index=False, quoting=3, quotechar='',
+                               escapechar='', sep='\t')
+            df_password_agg.to_csv(os.path.join(args.output, 'passwords_agg.csv'), index=False, quoting=3, quotechar='',
+                                   escapechar='', sep='\t')
 
     def print_stats(self, df2print, type_str):
         """
@@ -347,27 +353,50 @@ class PasswordAnalyzer:
         elif type_str == 'password_agg':
             message('Reused Passwords:', title=True)
             for i in range(0, 8):
+                if df2print.empty:
+                    message('Empty input file for the function', stat=True)
+                    break
                 message(message(str(df2print['Password'].iloc[i]), word=True) + ' occurred ' + message(
                     str(df2print['Count'].iloc[i]), word=True) + ' times', stat=True)
 
         elif type_str == 'tokens':
             message('Common Tokens and Words in Passwords:', title=True)
             for i in range(0, 8):
+                if df2print.empty:
+                    message('Empty input file for the function', stat=True)
+                    break
+                print(df2print.to_string())
                 message('The token ' + message(str(df2print['Tokens'].iloc[i]), word=True) + ' was used ' + message(
                     str(df2print['Count'].iloc[i]), word=True) + ' times', stat=True)
 
         elif type_str == 'mask_agg':
             message('Common Password Masks:', title=True)
             for i in range(0, 8):
+                if df2print.empty:
+                    message('Empty input file for the function. Note masks that occurred only once are dropped.',
+                            stat=True)
+                    break
                 message(message(str(df2print['Count'].iloc[i]), word=True) + ' passwords used the mask ' + message(
                     str(df2print['Mask'].iloc[i]), word=True), stat=True)
-                message('For example: ' + message(
-                    str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[0]),
-                    word=True) + ', ' + message(
-                    str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[1]),
-                    word=True) + ', and ' + message(
-                    str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[2]), word=True),
-                        stat=True)
+                try:
+                    message('For example: ' + message(
+                        str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[0]),
+                        word=True) + ', ' + message(
+                        str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[1]),
+                        word=True) + ', and ' + message(
+                        str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[2]), word=True),
+                            stat=True)
+                except IndexError:
+                    try:
+                        message('For example: ' + message(
+                            str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[0]),
+                            word=True) + ', ' + message(
+                            str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[1]),
+                            word=True))
+                    except IndexError:
+                        message('For example: ' + message(
+                            str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[0]),
+                            word=True))
 
 
 if __name__ == '__main__':
