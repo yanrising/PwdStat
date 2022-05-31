@@ -365,7 +365,6 @@ class PasswordAnalyzer:
                 if df2print.empty:
                     message('Empty input file for the function', stat=True)
                     break
-                print(df2print.to_string())
                 message('The token ' + message(str(df2print['Tokens'].iloc[i]), word=True) + ' was used ' + message(
                     str(df2print['Count'].iloc[i]), word=True) + ' times', stat=True)
 
