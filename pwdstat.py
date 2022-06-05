@@ -284,8 +284,8 @@ class PasswordAnalyzer:
         df_password_agg.reset_index(drop=True)
 
         if self.filter:
-            df_mask_agg = df_mask_agg[df_mask_agg['Count'] > round(df_mask_agg.size * 0.001, 0)]
-            df_tokens = df_tokens[df_tokens['Count'] > round(df_tokens.size * 0.001, 0)]
+            df_mask_agg = df_mask_agg[df_mask_agg['Count'] > round(df_mask_agg.size * 0.0001, 0)]
+            df_tokens = df_tokens[df_tokens['Count'] > round(df_tokens.size * 0.0001, 0)]
 
         self.print_stats(self.df, 'full')
         self.print_stats(df_password_agg, 'password_agg')
@@ -409,7 +409,7 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output", action="store", default=False,
                         help="Prints CSV files to directory. The default is cwd.")
     parser.add_argument("-f", "--filter", action="store_true", default=False,
-                        help="Filter subpar from results and bottom 0.1 percent of masks and tokens.")
+                        help="Filter subpar from results and bottom 0.01 percent of masks and tokens.")
     parser.add_argument("-q", "--quiet", action="store_true", default=False,
                         help="Hides banner")
 
