@@ -14,7 +14,7 @@ CLI tool for identifying systemic password usage, creating password masks, and a
 ```sh
 pwdstat.py -h
 
-usage: pwdstat.py [-h] [-i INPUT] [-c COMPARE] [-o OUTPUT] [-f] [-q]
+usage: pwdstat.py [-h] [-i INPUT] [-c COMPARE] [-o OUTPUT] [-f] [-q] [-v]
 
 Tool for identifying systemic password usage, creating password masks, and analyzing cracked password samples with
 human readable statistics
@@ -27,8 +27,9 @@ optional arguments:
                         Directory of lists to compare against.
   -o OUTPUT, --output OUTPUT
                         Prints CSV files to directory. The default is cwd.
-  -f, --filter          Filter subpar from results and bottom 0.1 percent of masks and tokens.
+  -f, --filter          Filter subpar from results and bottom 0.01 percent of masks and tokens.
   -q, --quiet           Hides banner
+  -v, --viz             Creates visuals of data in output directory.
 ```
 Take a list of cracked passwords and analyze them.
 ```
@@ -115,6 +116,16 @@ The files are **tab** seperated for easy parsing without quoting issues.
 ```
 cat passwords.csv | awk -F '\t' '{print $1}'
 ```
+
+Graphs can also be created with `-v` and created visuals are in PDF format and are printed to the same output directory:
+
+- Common Password Tokens
+- Password Classes of Cracked Passwords
+- Average Length of Cracked Passwords
+- Common Password Masks
+
+***
+
 ### passwords.csv
 All of the passwords from the set tagged
 |Password|Class|Complexity|Length|Mask|Is In *|
