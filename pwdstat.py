@@ -62,6 +62,12 @@ class PasswordAnalyzer:
                            '<', '=', '>', '?', '@', '[', '\', \']', '^', '_', '`', '{', '|', '}', '~', ']']
         self.df = password_df
         self.filter = filter_lowqual
+        self.filter_percent = 0.0001
+        self.viz_label_color = '#3c444c'
+        self.viz_tick_color = '#333333'
+        self.viz_face_color = '#eeeeee'
+        self.viz_data_color1 = '#157394'
+        self.viz_data_color2 = '#dc4c4c'
 
     def classify_passwords(self):
         """
@@ -284,8 +290,8 @@ class PasswordAnalyzer:
         df_password_agg.reset_index(drop=True)
 
         if self.filter:
-            df_mask_agg = df_mask_agg[df_mask_agg['Count'] > round(df_mask_agg.size * 0.0001, 0)]
-            df_tokens = df_tokens[df_tokens['Count'] > round(df_tokens.size * 0.0001, 0)]
+            df_mask_agg = df_mask_agg[df_mask_agg['Count'] > round(df_mask_agg.size * self.filter_percent, 0)]
+            df_tokens = df_tokens[df_tokens['Count'] > round(df_tokens.size * self.filter_percent, 0)]
 
         self.print_stats(self.df, 'full')
         self.print_stats(df_password_agg, 'password_agg')
@@ -303,6 +309,13 @@ class PasswordAnalyzer:
                                escapechar='', sep='\t')
             df_password_agg.to_csv(os.path.join(args.output, 'passwords_agg.csv'), index=False, quoting=3, quotechar='',
                                    escapechar='', sep='\t')
+
+        if args.viz:
+            self.print_viz(df_tokens.head(20).set_index('Tokens'), 'bar' , 'Common Password Tokens', 'Count', 'Token', 'common-password-tokens')
+            self.print_viz(df_class_agg.set_index('Class')['Count'], 'bar' , 'Password Classes of Cracked Passwords', 'Count', 'Class', 'password-classes')
+            self.print_viz(df_class_agg.set_index('Class').drop(columns=['Count', 'Complexity']), 'box' , 'Average Length of Cracked Passwords', 'Count', 'Length', 'avg-password-length')
+            self.print_viz(df_mask_agg.head(20).set_index('Mask').drop(columns=['Complexity', 'Length']), 'bar' , 'Common Password Masks', 'Count', 'Mask', 'common-password-masks')
+
 
     def print_stats(self, df2print, type_str):
         """
@@ -397,6 +410,19 @@ class PasswordAnalyzer:
                             str(self.df['Password'][self.df['Mask'] == str(df2print['Mask'].iloc[i])].iloc[0]),
                             word=True))
 
+    def print_viz(self, df, chart_type, title, xlabel, ylabel, output_name):
+
+        if chart_type == 'bar':
+            ax = df.plot(kind="barh", fontsize=5, color=self.viz_data_color1, alpha=0.5)
+        elif chart_type == 'box':
+           ax = df.plot.box(vert=False)
+        
+        ax.set_title(title, color=self.viz_label_color)
+        ax.set_xlabel(xlabel, color=self.viz_label_color)
+        ax.set_ylabel(ylabel, color=self.viz_label_color)
+        ax.tick_params(labelcolor=self.viz_tick_color)
+        ax.set_facecolor(self.viz_face_color)
+        ax.figure.savefig(str(output_name) + '.pdf')
 
 if __name__ == '__main__':
     # colorama
@@ -412,6 +438,8 @@ if __name__ == '__main__':
                         help="Filter subpar from results and bottom 0.01 percent of masks and tokens.")
     parser.add_argument("-q", "--quiet", action="store_true", default=False,
                         help="Hides banner")
+    parser.add_argument("-v", "--viz", action="store_true", default=False,
+                        help="Creates visuals of data in output directory.")
 
     dep_check()
     pd.set_option('mode.chained_assignment', None)
