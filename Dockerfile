@@ -13,5 +13,5 @@ RUN apt-get update; apt-get install -y git python3 pip curl; rm -rf /var/lib/apt
 FROM python:slim
 COPY --from=build /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-
-ENTRYPOINT ["/opt/venv/bin/pwdstat.py"]
+RUN apt-get update; apt-get install -y tini; rm -rf /var/lib/apt/lists/*
+ENTRYPOINT ["/usr/bin/tini", "--", "/opt/venv/bin/pwdstat.py"]
