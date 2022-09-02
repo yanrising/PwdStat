@@ -299,8 +299,6 @@ class PasswordAnalyzer:
         self.print_stats(df_mask_agg, 'mask_agg')
 
         if args.output:
-            self.df.to_csv(os.path.join(args.output, 'passwords.csv'), index=False, quoting=3, quotechar='',
-                           escapechar='', sep='\t')
             df_tokens.to_csv(os.path.join(args.output, 'common_tokens.csv'), index=False, quoting=3, quotechar='',
                              escapechar='', sep='\t')
             df_class_agg.to_csv(os.path.join(args.output, 'password_classes.csv'), index=False, quoting=3, quotechar='',
