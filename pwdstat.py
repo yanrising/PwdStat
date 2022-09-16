@@ -420,7 +420,7 @@ class PasswordAnalyzer:
         ax.set_ylabel(ylabel, color=self.viz_label_color)
         ax.tick_params(labelcolor=self.viz_tick_color)
         ax.set_facecolor(self.viz_face_color)
-        ax.figure.savefig(str(output_name) + '.pdf')
+        ax.figure.savefig(os.path.join(args.output, str(output_name) + '.pdf'))
 
 if __name__ == '__main__':
     # colorama
