@@ -16,8 +16,7 @@ pwdstat.py -h
 
 usage: pwdstat.py [-h] [-i INPUT] [-c COMPARE] [-o OUTPUT] [-f] [-q] [-v]
 
-Tool for identifying systemic password usage, creating password masks, and analyzing cracked password samples with
-human readable statistics
+Tool for identifying systemic password usage, creating password masks, and analyzing cracked password samples with human readable statistics
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -31,21 +30,29 @@ optional arguments:
   -q, --quiet           Hides banner
   -v, --viz             Creates visuals of data in output directory.
 ```
+
 Take a list of cracked passwords and analyze them.
+
 ```
 pwdstat.py -i cracked_wordlist.txt
 
 cat cracked_wordlist | pwdstat.py
 ```
+
 Filter out passwords that do not meet minimum complexity requirements and the bottom 0.1% of tokens and masks.
+
 ```
 cat cracked_wordlist | pwdstat.py -f
 ```
+
 Compare input list against a directory of wordlists and mark ones that appear in them.
+
 ```
 pwdstat.py -i cracked_wordlist.txt -c ./breach-data/
 ```
+
 Input and compare but also output CSV files with data to a directory.
+
 ```
 pwdstat.py -i cracked_wordlist.txt -c ./breach-data -o pwd_output
  __        __   __  ___      ___
@@ -101,7 +108,6 @@ For example: dcshoes21, dcshoes13, and dcshoes01
 For example: jessi03, jessi03, and dcsan13
 ```
 
-
 ## Install
 **PwdStat** works on Windows and *Nix systems and requires Python.
 ```
@@ -110,8 +116,10 @@ git clone
 ```
 pip install -r requirements.txt
 ```
+
 ## Output
 The `-o` flag is used to direct the CSV output files to a directory by default **PwdStat** does not print output files. 
+
 The files are **tab** seperated for easy parsing without quoting issues.
 ```
 cat passwords.csv | awk -F '\t' '{print $1}'
